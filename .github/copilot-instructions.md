@@ -36,6 +36,16 @@ The only exception is the chatbot, which is served via Django REST Framework.
 9. Every new decision must be logged in docs/decisions.md.
 10. When uncertain about a field name or relationship — stop and check architecture.md.
 
+## Known Exceptions to CoreModel Rule
+- The User model extends AbstractUser only — do NOT also inherit CoreModel
+- AbstractUser already provides id and date_joined (equivalent to created_at)
+- Add updated_at and is_deleted manually to User model
+
+## App Name Reference (exact names, no variations)
+- users, products, orders, payments, chatbot, core
+- Category model lives in products app → 'products.Category'
+- There is no 'categories' app
+
 ## Concrete Examples — Right vs Wrong
 
 ### Model fields
