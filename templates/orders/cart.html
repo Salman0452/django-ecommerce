@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <h1>Shopping Cart</h1>
+    
+    {% if cart.items.all %}
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart.items.all %}
+                    {% if not item.is_deleted %}
+                        <tr class="cart-item" data-product-id="{{ item.product.id }}">
+                            <td>
+                                <a href="{% url 'products:detail' slug=item.product.slug %}">
+                                    {{ item.product.name }}
+                                </a>
+                            </td>
+                            <td>${{ item.product.price }}</td>
+                            <td>
+                                <input type="number" 
+                                       class="quantity-input" 
+                                       value="{{ item.quantity }}" 
+                                       min="1" 
+                                       data-item-id="{{ item.id }}">
+                            </td>
+                            <td>${{ item.product.price|add:item.quantity }}</td>
+                            <td>
+                                <button class="btn-remove-item" data-product-id="{{ item.product.id }}">
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="cart-summary">
+            <div class="total">
+                <strong>Total: </strong>
+                <span class="total-price">${{ cart.total }}</span>
+            </div>
+            <div class="item-count">
+                <span>Items: {{ cart.item_count }}</span>
+            </div>
+        </div>
+        
+        <div class="cart-actions">
+            <a href="{% url 'products:list' %}" class="btn btn-secondary">Continue Shopping</a>
+            <a href="{% url 'orders:checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
+        </div>
+    {% else %}
+        <p class="empty-cart-message">Your cart is empty.</p>
+        <a href="{% url 'products:list' %}" class="btn btn-primary">Start Shopping</a>
+    {% endif %}
+</div>
+
+<script>
+document.getElementById('cart-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // Cart submission logic would go here
+});
+
+document.querySelectorAll('.btn-remove-item').forEach(button => {
+    button.addEventListener('click', async (e) => {
+        const productId = e.target.dataset.productId;
+        // Remove item logic would go here
+    });
+});
+</script>
+{% endblock %}
