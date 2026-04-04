@@ -130,5 +130,5 @@ class OrderDetailView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['order'] = get_order_by_id(kwargs['pk'], self.request.user)
+        context['order'] = get_order_by_id(self.kwargs['pk'], self.request.user)
         return context
