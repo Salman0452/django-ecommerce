@@ -1,6 +1,7 @@
 from django.db import models
 from apps.core.models import CoreModel
 
+
 class Category(CoreModel):
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(unique=True)
@@ -10,9 +11,14 @@ class Category(CoreModel):
         ordering = ['name']
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+        indexes = [
+            models.Index(fields=['slug']),
+            models.Index(fields=['is_active']),
+        ]
 
     def __str__(self):
         return self.name
+
 
 class Product(CoreModel):
     name = models.CharField(max_length=255)
@@ -29,9 +35,12 @@ class Product(CoreModel):
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = 'Product'
+        verbose_name_plural = 'Products'
         indexes = [
             models.Index(fields=['slug']),
             models.Index(fields=['is_active']),
+            models.Index(fields=['category']),
         ]
 
     def __str__(self):

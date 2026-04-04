@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ product.name }}</h1>
+
+<p><strong>Slug:</strong> {{ product.slug }}</p>
+<p><strong>Description:</strong> {{ product.description }}</p>
+<p><strong>Price:</strong> {{ product.price }}</p>
+<p><strong>Stock:</strong> {{ product.stock }}</p>
+<p><strong>Active:</strong> {{ product.is_active }}</p>
+<p><strong>Category:</strong> {{ product.category.name }}</p>
+<p><strong>Created At:</strong> {{ product.created_at }}</p>
+<p><strong>Updated At:</strong> {{ product.updated_at }}</p>
+{% endblock %}

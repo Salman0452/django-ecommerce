@@ -20,3 +20,8 @@
 **Date**: 2026-04-01
 **Decision**: snake_case everywhere in Python and DB. camelCase only in JS and DRF JSON.
 **Reason**: Prevents naming conflicts between agents.
+
+## ADR-005 — Products app uses service-backed CBVs
+**Date**: 2026-04-04
+**Decision**: Implement product listing and detail pages using class-based views that delegate data access to `apps.products.services`.
+**Reason**: Keeps business/query logic out of views and follows project service-layer conventions.
