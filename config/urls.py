@@ -5,10 +5,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('apps.products.urls')),
     path('orders/', include('apps.orders.urls')),
     path('account/', include('apps.users.urls')),
+    path('payments/', include('apps.payments.urls')),
     path('api/v1/chatbot/', include('apps.chatbot.urls')),
+    # Products URLs use an empty prefix with <slug:slug>/ — keep last to avoid
+    # shadowing other top-level prefixes.
+    path('', include('apps.products.urls')),
 ]
 
 if settings.DEBUG:
