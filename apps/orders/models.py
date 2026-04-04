@@ -51,17 +51,52 @@ class CartItem(CoreModel):
         related_name='cart_items'
     )
     quantity = models.PositiveIntegerField(default=1)
-    
+
+    @property
+    def subtotal(self):
+        """Calculate the subtotal for this cart item."""
+        return self.product.price * self.quantity
+
     def __str__(self):
         return f"{self.product.name} x{self.quantity}"
-    
+
     class Meta:
-        verbose_name = 'Cart Item'
         verbose_name_plural = 'Cart Items'
         unique_together = ('cart', 'product')
         indexes = [
             models.Index(fields=['cart_id']),
         ]
+
+class OrderItem(CoreModel):
+    """Line item within an order."""
+
+    order = models.ForeignKey(
+        'orders.Order',
+        on_delete=models.CASCADE,
+        related_name='items'
+    )
+    product = models.ForeignKey(
+        'products.Product',
+        on_delete=models.PROTECT,
+        related_name='order_items'
+    )
+    quantity = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.product.name} x{self.quantity}"
+
+    class Meta:
+        verbose_name = 'Order Item'
+        verbose_name_plural = 'Order Items'
+        indexes = [
+            models.Index(fields=['order_id']),
+        ]
+
+    @property
+    def subtotal(self):
+        return self.price * self.quantity
+
 
 class Order(CoreModel):
     """Order placed by a user."""
