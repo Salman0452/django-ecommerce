@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Payment History{% endblock %}
+
+{% block content %}
+<div class="payment-history-container">
+    <h1>Payment History</h1>
+
+    {% if payments %}
+        <table class="payments-table">
+            <thead>
+                <tr>
+                    <th>Payment #</th>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.id }}</td>
+                        <td>{{ payment.order.id }}</td>
+                        <td>{{ payment.created_at|date:"N j, Y" }}</td>
+                        <td>${{ payment.amount }}</td>
+                        <td>{{ payment.get_status_display }}</td>
+                        <td>
+                            <a href="{% url 'payments:payment_detail' pk=payment.pk %}">View</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no payment records yet.</p>
+        <a href="{% url 'products:list' %}" class="btn btn-primary">Start Shopping</a>
+    {% endif %}
+</div>
+{% endblock %}
