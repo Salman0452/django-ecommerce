@@ -76,13 +76,15 @@ class OrderModelTest(TestCase):
 
     def test_order_shipping_address_required(self):
         """Test that shipping_address is required."""
-        with self.assertRaises(ValueError):
-            Order.objects.create(
-                user=self.user,
-                status='pending',
-                total_price=Decimal('50.00'),
-                shipping_address=''
-            )
+        from django.core.exceptions import ValidationError
+        order = Order(
+            user=self.user,
+            status='pending',
+            total_price=Decimal('99.99'),
+            shipping_address=''
+        )
+        with self.assertRaises(ValidationError):
+            order.full_clean()
 
     def test_order_user_foreignkey_protect(self):
         """Test that deleting user is protected when orders exist."""
@@ -115,21 +117,29 @@ class OrderModelTest(TestCase):
 
     def test_order_default_ordering(self):
         """Test that orders are ordered by -created_at by default."""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        # Force different timestamps
         order1 = Order.objects.create(
             user=self.user,
             status='pending',
             total_price=Decimal('50.00'),
-            shipping_address='600 Ash Ct'
+            shipping_address='First Address'
         )
+        Order.objects.filter(pk=order1.pk).update(
+            created_at=timezone.now() - timedelta(seconds=10)
+        )
+        
         order2 = Order.objects.create(
             user=self.user,
-            status='paid',
+            status='pending',
             total_price=Decimal('100.00'),
-            shipping_address='700 Walnut Blvd'
+            shipping_address='Second Address'
         )
-        orders = Order.objects.all()
+
+        orders = Order.objects.filter(user=self.user)
         self.assertEqual(orders.first().id, order2.id)
-        self.assertEqual(orders.last().id, order1.id)
 
     def test_order_inherits_from_coremodel(self):
         """Test that Order has CoreModel fields."""
