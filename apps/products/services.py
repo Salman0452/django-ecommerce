@@ -31,3 +31,11 @@ def get_product_by_slug(slug):
         )
     except Product.DoesNotExist as exc:
         raise Http404('Product not found.') from exc
+
+
+def get_featured_products():
+    """Return the 4 most recently added active products."""
+    return Product.objects.filter(
+        is_active=True,
+        is_deleted=False,
+    ).select_related('category').order_by('-created_at')[:4]
