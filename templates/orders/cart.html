@@ -5,8 +5,17 @@
 {% block content %}
 <div class="cart-container">
     <h1>Shopping Cart</h1>
-    
-    {% if cart.items.all %}
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% with active_items=cart.items.all %}
+    {% if active_items %}
         <table class="cart-table">
             <thead>
                 <tr>
@@ -18,7 +27,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for item in cart.items.all %}
+                {% for item in active_items %}
                     {% if not item.is_deleted %}
                         <tr class="cart-item" data-product-id="{{ item.product.id }}">
                             <td>
@@ -28,24 +37,31 @@
                             </td>
                             <td>${{ item.product.price }}</td>
                             <td>
-                                <input type="number" 
-                                       class="quantity-input" 
-                                       value="{{ item.quantity }}" 
-                                       min="1" 
-                                       data-item-id="{{ item.id }}">
+                                <form method="post" action="{% url 'orders:cart_update' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                    <input type="number"
+                                           name="quantity"
+                                           class="quantity-input"
+                                           value="{{ item.quantity }}"
+                                           min="1">
+                                    <button type="submit">Update</button>
+                                </form>
                             </td>
-                            <td>${{ item.product.price|add:item.quantity }}</td>
+                            <td>${{ item.subtotal }}</td>
                             <td>
-                                <button class="btn-remove-item" data-product-id="{{ item.product.id }}">
-                                    Remove
-                                </button>
+                                <form method="post" action="{% url 'orders:cart_remove' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                    <button type="submit" class="btn-remove-item">Remove</button>
+                                </form>
                             </td>
                         </tr>
                     {% endif %}
                 {% endfor %}
             </tbody>
         </table>
-        
+
         <div class="cart-summary">
             <div class="total">
                 <strong>Total: </strong>
@@ -55,7 +71,7 @@
                 <span>Items: {{ cart.item_count }}</span>
             </div>
         </div>
-        
+
         <div class="cart-actions">
             <a href="{% url 'products:list' %}" class="btn btn-secondary">Continue Shopping</a>
             <a href="{% url 'orders:checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
@@ -64,19 +80,7 @@
         <p class="empty-cart-message">Your cart is empty.</p>
         <a href="{% url 'products:list' %}" class="btn btn-primary">Start Shopping</a>
     {% endif %}
+    {% endwith %}
 </div>
-
-<script>
-document.getElementById('cart-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    // Cart submission logic would go here
-});
-
-document.querySelectorAll('.btn-remove-item').forEach(button => {
-    button.addEventListener('click', async (e) => {
-        const productId = e.target.dataset.productId;
-        // Remove item logic would go here
-    });
-});
-</script>
 {% endblock %}
+

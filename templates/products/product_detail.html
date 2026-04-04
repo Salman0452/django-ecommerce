@@ -11,4 +11,20 @@
 <p><strong>Category:</strong> {{ product.category.name }}</p>
 <p><strong>Created At:</strong> {{ product.created_at }}</p>
 <p><strong>Updated At:</strong> {{ product.updated_at }}</p>
+
+{% if user.is_authenticated and product.stock > 0 %}
+    <form method="post" action="{% url 'orders:cart_add' %}">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
+        <button type="submit" class="btn btn-primary">Add to Cart</button>
+    </form>
+{% elif not user.is_authenticated %}
+    <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-secondary">Login to Add to Cart</a>
+{% else %}
+    <p>Out of stock</p>
+{% endif %}
 {% endblock %}
+
