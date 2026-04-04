@@ -25,3 +25,9 @@
 **Date**: 2026-04-04
 **Decision**: Implement product listing and detail pages using class-based views that delegate data access to `apps.products.services`.
 **Reason**: Keeps business/query logic out of views and follows project service-layer conventions.
+
+## ADR-005 — Stock field index deferred
+**Date**: 2026-04-04
+**Decision**: No index on products_product.stock for now.
+**Reason**: No query patterns established yet. Add when inventory 
+filtering queries are identified and data volume justifies it.
