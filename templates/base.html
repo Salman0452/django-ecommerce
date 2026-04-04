@@ -9,6 +9,8 @@
     <nav>
         <a href="{% url 'products:list' %}">Home</a>
         {% if user.is_authenticated %}
+            <a href="{% url 'orders:cart' %}">Cart ({{ user.cart.item_count|default:0 }})</a>
+            <a href="{% url 'orders:order_history' %}">My Orders</a>
             <a href="{% url 'users:profile' %}">Profile ({{ user.email }})</a>
             <form method="post" action="{% url 'users:logout' %}" style="display:inline;">
                 {% csrf_token %}
