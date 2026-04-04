@@ -1,5 +1,7 @@
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import FormView, ListView, TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -49,9 +51,11 @@ class AddToCartView(LoginRequiredMixin, View):
         except ValueError as exc:
             messages.error(request, str(exc))
 
-        next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or ''
-        if next_url.startswith('/'):
-            return redirect(next_url)
+        next_url = request.POST.get('next', '')
+        if next_url and url_has_allowed_host_and_scheme(
+            url=next_url, allowed_hosts={request.get_host()}
+        ):
+            return HttpResponseRedirect(next_url)
         return redirect('orders:cart')
 
 

@@ -61,6 +61,7 @@ class CartItem(CoreModel):
         return f"{self.product.name} x{self.quantity}"
 
     class Meta:
+        verbose_name = 'Cart Item'
         verbose_name_plural = 'Cart Items'
         unique_together = ('cart', 'product')
         indexes = [
