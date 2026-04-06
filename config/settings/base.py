@@ -97,3 +97,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
+
+GROQ_API_KEY = env('GROQ_API_KEY')
+GROQ_MODEL = env('GROQ_MODEL', default='llama-3.3-70b-versatile')

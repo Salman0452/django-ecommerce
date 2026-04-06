@@ -1,6 +1,10 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
+
+from .views import ChatHistoryView, ChatView
 
 app_name = 'chatbot'
 
-urlpatterns = []
+urlpatterns = [
+	path('', ChatView.as_view(), name='chat'),
+	path('history/', ChatHistoryView.as_view(), name='history'),
+]

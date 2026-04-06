@@ -36,3 +36,9 @@
 **Date**: 2026-04-04
 **Decision**: Move `path('', include('apps.products.urls'))` to the end of `urlpatterns` in `config/urls.py`.
 **Reason**: The products app uses an empty prefix (`''`) with a `<slug:slug>/` wildcard pattern. When registered first it shadowed `/payments/`, `/orders/`, and `/account/` routes — Django's URL resolver matched 'payments', 'orders', and 'account' as slugs before the dedicated includes could be tried. Registering the products include last ensures fixed-prefix apps are resolved first.
+
+## ADR-008 — Chatbot service + DRF API with session-backed history and Groq
+**Date**: 2026-04-06
+**Decision**: Implement chatbot functionality using service-layer Groq SDK calls in `apps.chatbot.services`, DRF API endpoints at `/api/v1/chatbot/` and `/api/v1/chatbot/history/`, and session-backed message history via `chatbot_session` and `chatbot_message` models.
+**Reason**: Keeps LLM/business logic out of views, supports both authenticated and anonymous users consistently through Django sessions, and follows the architecture requirement that only chatbot uses DRF.
+**Trade-off**: Conversation context grows with message history and can increase token usage over time; future optimization may require truncation/summarization.

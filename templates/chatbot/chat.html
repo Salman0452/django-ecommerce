@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop Assistant{% endblock %}
+
+{% block content %}
+<section style="max-width: 820px; margin: 1.5rem auto; padding: 1rem; border: 1px solid #ddd; border-radius: 12px;">
+    <h1 style="margin-top: 0;">AI Shopping Assistant</h1>
+    <p>Ask about products, order help, and shopping advice.</p>
+
+    <div id="chat-messages" style="height: 420px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 10px; padding: 0.75rem; background: #fafafa;"></div>
+
+    <form id="chat-form" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+        <input
+            id="chat-input"
+            name="message"
+            type="text"
+            required
+            placeholder="Type your message..."
+            style="flex: 1; padding: 0.65rem 0.75rem; border-radius: 8px; border: 1px solid #cbd5e1;"
+        />
+        <button type="submit" style="padding: 0.65rem 1rem; border-radius: 8px; border: 0; background: #1d4ed8; color: #fff; cursor: pointer;">
+            Send
+        </button>
+    </form>
+</section>
+
+<script>
+    (function () {
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const messagesContainer = document.getElementById('chat-messages');
+
+        function getCookie(name) {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find((row) => row.startsWith(name + '='));
+            return cookieValue ? decodeURIComponent(cookieValue.split('=')[1]) : null;
+        }
+
+        function renderMessage(role, content) {
+            const bubble = document.createElement('div');
+            bubble.style.maxWidth = '85%';
+            bubble.style.marginBottom = '0.6rem';
+            bubble.style.padding = '0.55rem 0.75rem';
+            bubble.style.borderRadius = '10px';
+            bubble.style.whiteSpace = 'pre-wrap';
+
+            if (role === 'user') {
+                bubble.style.marginLeft = 'auto';
+                bubble.style.background = '#dbeafe';
+                bubble.textContent = content;
+            } else {
+                bubble.style.marginRight = 'auto';
+                bubble.style.background = '#ecfccb';
+                bubble.textContent = content;
+            }
+
+            messagesContainer.appendChild(bubble);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function loadHistory() {
+            const response = await fetch('/api/v1/chatbot/history/', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+            messagesContainer.innerHTML = '';
+            (data.messages || []).forEach((message) => {
+                renderMessage(message.role, message.content);
+            });
+        }
+
+        chatForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const message = chatInput.value.trim();
+            if (!message) {
+                return;
+            }
+
+            renderMessage('user', message);
+            chatInput.value = '';
+
+            const response = await fetch('/api/v1/chatbot/', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            if (!response.ok) {
+                renderMessage('assistant', 'Sorry, I could not process that request right now.');
+                return;
+            }
+
+            const data = await response.json();
+            renderMessage('assistant', data.response || 'No response received.');
+        });
+
+        loadHistory();
+    })();
+</script>
+{% endblock %}
