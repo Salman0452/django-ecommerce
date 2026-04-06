@@ -1,41 +1,59 @@
 {% extends "base.html" %}
 
-{% block title %}Payment History{% endblock %}
+{% block title %}Payments{% endblock %}
 
 {% block content %}
-<div class="payment-history-container">
-    <h1>Payment History</h1>
+<section class="stack">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Payments</h1>
+            <p class="page-subtitle">Review your payment history and receipts.</p>
+        </div>
+    </div>
 
     {% if payments %}
-        <table class="payments-table">
-            <thead>
-                <tr>
-                    <th>Payment #</th>
-                    <th>Order #</th>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for payment in payments %}
-                    <tr>
-                        <td>{{ payment.id }}</td>
-                        <td>{{ payment.order.id }}</td>
-                        <td>{{ payment.created_at|date:"N j, Y" }}</td>
-                        <td>${{ payment.amount }}</td>
-                        <td>{{ payment.get_status_display }}</td>
-                        <td>
-                            <a href="{% url 'payments:payment_detail' pk=payment.pk %}">View</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="card">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Payment ID</th>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th class="table__cell--right">Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                            <tr>
+                                <td>#{{ payment.id }}</td>
+                                <td>#{{ payment.order.id }}</td>
+                                <td>{{ payment.created_at|date:"N j, Y" }}</td>
+                                <td class="table__cell--right">${{ payment.amount }}</td>
+                                <td>
+                                    <span class="badge {% if payment.status == 'pending' %}badge--warning{% elif payment.status == 'completed' %}badge--success{% else %}badge--danger{% endif %}">
+                                        {{ payment.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="table__actions">
+                                    <a href="{% url 'payments:payment_detail' pk=payment.pk %}" class="btn btn-secondary btn-sm">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% else %}
-        <p>You have no payment records yet.</p>
-        <a href="{% url 'products:list' %}" class="btn btn-primary">Start Shopping</a>
+        <div class="card empty-state">
+            <div class="stack">
+                <h2 class="page-title">No payments yet</h2>
+                <p class="empty-state__text">Your payment records will appear here after checkout.</p>
+            </div>
+            <a href="{% url 'products:list' %}" class="btn btn-primary">Browse Products</a>
+        </div>
     {% endif %}
-</div>
+</section>
 {% endblock %}

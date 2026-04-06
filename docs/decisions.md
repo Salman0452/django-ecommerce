@@ -42,3 +42,13 @@
 **Decision**: Implement chatbot functionality using service-layer Groq SDK calls in `apps.chatbot.services`, DRF API endpoints at `/api/v1/chatbot/` and `/api/v1/chatbot/history/`, and session-backed message history via `chatbot_session` and `chatbot_message` models.
 **Reason**: Keeps LLM/business logic out of views, supports both authenticated and anonymous users consistently through Django sessions, and follows the architecture requirement that only chatbot uses DRF.
 **Trade-off**: Conversation context grows with message history and can increase token usage over time; future optimization may require truncation/summarization.
+
+## ADR-009 — Shared storefront base template and chat widget foundation
+**Date**: 2026-04-06
+**Decision**: Build a shared `templates/base.html` foundation with a sticky responsive header, reusable flash messages component, footer columns, and a floating chatbot panel backed by `static/css/base.css` and `static/js/main.js`.
+**Reason**: Gives every storefront page a consistent shell, keeps UI behavior centralized, and provides one entry point for messaging, mobile navigation, and chatbot interactions.
+
+## ADR-010 — Homepage at root and catalog under /products/
+**Date**: 2026-04-06
+**Decision**: Route the storefront homepage at `/` via `products:home` and move the product catalog list to `/products/` via `products:list`, with homepage category links filtering the catalog by category slug.
+**Reason**: Matches the documented URL structure, keeps the homepage distinct from the browsable catalog, and makes the category cards useful for guided discovery.

@@ -1,15 +1,18 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import Http404
 
-from .models import Product
+from .models import Category, Product
 
 
-def get_active_products(page=1, per_page=12):
+def get_active_products(page=1, per_page=12, category_slug=None):
     """Return a paginated collection of active, non-deleted products."""
     queryset = Product.objects.filter(
         is_active=True,
         is_deleted=False,
     ).select_related('category')
+
+    if category_slug:
+        queryset = queryset.filter(category__slug=category_slug)
 
     paginator = Paginator(queryset, per_page)
 
@@ -39,3 +42,11 @@ def get_featured_products():
         is_active=True,
         is_deleted=False,
     ).select_related('category').order_by('-created_at')[:4]
+
+
+def get_active_categories():
+    """Return all active, non-deleted categories for storefront browsing."""
+    return Category.objects.filter(
+        is_active=True,
+        is_deleted=False,
+    ).order_by('name')

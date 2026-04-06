@@ -1,30 +1,62 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ product.name }}{% endblock %}
+
 {% block content %}
-<h1>{{ product.name }}</h1>
+<section class="grid-2">
+    <article class="card product-card">
+        <div class="product-hero__media" aria-hidden="true">
+            {{ product.name|slice:":1"|upper }}
+        </div>
+    </article>
 
-<p><strong>Slug:</strong> {{ product.slug }}</p>
-<p><strong>Description:</strong> {{ product.description }}</p>
-<p><strong>Price:</strong> {{ product.price }}</p>
-<p><strong>Stock:</strong> {{ product.stock }}</p>
-<p><strong>Active:</strong> {{ product.is_active }}</p>
-<p><strong>Category:</strong> {{ product.category.name }}</p>
-<p><strong>Created At:</strong> {{ product.created_at }}</p>
-<p><strong>Updated At:</strong> {{ product.updated_at }}</p>
+    <article class="card product-hero__body">
+        <div class="product-hero__meta">
+            <span class="badge badge--primary">{{ product.category.name }}</span>
+            {% if product.stock > 0 %}
+                <span class="badge badge--success">In stock</span>
+            {% else %}
+                <span class="badge badge--danger">Out of stock</span>
+            {% endif %}
+        </div>
 
-{% if user.is_authenticated and product.stock > 0 %}
-    <form method="post" action="{% url 'orders:cart_add' %}">
-        {% csrf_token %}
-        <input type="hidden" name="product_id" value="{{ product.id }}">
-        <input type="hidden" name="next" value="{{ request.path }}">
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}">
-        <button type="submit" class="btn btn-primary">Add to Cart</button>
-    </form>
-{% elif not user.is_authenticated %}
-    <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-secondary">Login to Add to Cart</a>
-{% else %}
-    <p>Out of stock</p>
-{% endif %}
+        <div>
+            <h1 class="product-hero__title">{{ product.name }}</h1>
+            <p class="product-hero__price">${{ product.price }}</p>
+        </div>
+
+        <p class="product-hero__description">{{ product.description|default:'This product is ready for your storefront.' }}</p>
+
+        <div class="summary-card card">
+            <div class="summary-list__row"><strong>Category</strong><span>{{ product.category.name }}</span></div>
+            <div class="summary-list__row"><strong>Stock</strong><span>{{ product.stock }}</span></div>
+            <div class="summary-list__row"><strong>Status</strong><span>{% if product.is_active %}Active{% else %}Inactive{% endif %}</span></div>
+            <div class="summary-list__row"><strong>Created</strong><span>{{ product.created_at|date:"N j, Y" }}</span></div>
+        </div>
+
+        {% if product.stock > 0 %}
+            <form method="post" action="{% url 'orders:cart_add' %}" class="product-hero__form">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <div class="quantity-control">
+                        <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" max="{{ product.stock }}">
+                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                    </div>
+                </div>
+            </form>
+        {% else %}
+            <div class="card empty-state">
+                <p class="empty-state__text">This item is currently out of stock. Check back later or browse other products.</p>
+            </div>
+        {% endif %}
+
+        <div class="product-hero__actions">
+            <a class="btn btn-secondary" href="{% url 'products:list' %}">Back to Products</a>
+        </div>
+    </article>
+</section>
 {% endblock %}
 

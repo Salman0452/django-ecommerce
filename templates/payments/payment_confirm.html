@@ -3,41 +3,58 @@
 {% block title %}Confirm Payment — Order #{{ order.id }}{% endblock %}
 
 {% block content %}
-<div class="payment-confirm-container">
-    <h1>Confirm Payment</h1>
-
-    <div class="order-summary">
-        <h2>Order #{{ order.id }}</h2>
-        <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
-
-        <table class="order-items-table">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Unit Price</th>
-                    <th>Qty</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in order.items.all %}
-                    <tr>
-                        <td>{{ item.product.name }}</td>
-                        <td>${{ item.price }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>${{ item.subtotal }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <p class="order-total"><strong>Total: ${{ payment.amount }}</strong></p>
+<section class="stack">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Confirm Payment</h1>
+            <p class="page-subtitle">Review your order before completing payment.</p>
+        </div>
     </div>
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Confirm Payment</button>
-        <a href="{% url 'orders:order_detail' pk=order.pk %}" class="btn btn-secondary">Cancel</a>
-    </form>
-</div>
+    <div class="grid-2">
+        <div class="card payment-card">
+            <h2 class="page-title">Order Summary</h2>
+            <div class="stack">
+                <div class="summary-list__row"><strong>Order</strong><span>#{{ order.id }}</span></div>
+                <div class="summary-list__row"><strong>Shipping Address</strong><span>{{ order.shipping_address }}</span></div>
+            </div>
+
+            <div class="table-wrap" style="margin-top:1rem;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ item.price }}</td>
+                                <td>${{ item.subtotal }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="summary-total"><strong>Total</strong><span>${{ payment.amount }}</span></div>
+        </div>
+
+        <aside class="card summary-card">
+            <h2 class="page-title">Payment Action</h2>
+            <p class="empty-state__text">Confirming payment will mark this order as completed in the system.</p>
+
+            <form method="post" class="payment-confirm__form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Confirm Payment</button>
+                <a href="{% url 'orders:order_detail' pk=order.pk %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </aside>
+    </div>
+</section>
 {% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}ShopAI | Smart Shopping{% endblock %}
+
+{% block content %}
+<section class="home-hero">
+    <div class="home-hero__inner">
+        <div class="stack home-hero__content">
+            <span class="badge badge--info home-hero__eyebrow">AI-powered storefront</span>
+            <h1 class="home-hero__title">Shop Smarter with AI</h1>
+            <p class="home-hero__subtitle">Discover products with our AI shopping assistant</p>
+            <div class="home-hero__actions">
+                <a class="btn btn-primary" href="{% url 'products:list' %}">Shop Now</a>
+                <button class="btn btn-secondary home-hero__chat" type="button" data-open-chat>Chat with AI</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="home-section stack">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Featured Products</h2>
+            <p class="page-subtitle">Our latest picks, ready for you to explore.</p>
+        </div>
+    </div>
+
+    {% if featured_products %}
+        <section class="product-grid" aria-label="Featured products">
+            {% for product in featured_products %}
+                <article class="card product-card">
+                    <a class="product-card__media" href="{% url 'products:detail' slug=product.slug %}" aria-label="View {{ product.name }} details">
+                        <span>{{ product.name|slice:":1"|upper }}</span>
+                    </a>
+
+                    <div class="product-card__body">
+                        <div class="product-card__meta">
+                            <span class="badge badge--primary">{{ product.category.name }}</span>
+                            {% if product.stock > 0 %}
+                                <span class="badge badge--success">In stock</span>
+                            {% else %}
+                                <span class="badge badge--danger">Out of stock</span>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="product-card__title">
+                            <a href="{% url 'products:detail' slug=product.slug %}">{{ product.name }}</a>
+                        </h3>
+
+                        <p class="product-card__price">${{ product.price }}</p>
+
+                        <p class="product-card__description">{{ product.description|default:'A featured product highlighted for the ShopAI storefront.'|truncatechars:120 }}</p>
+
+                        <div class="product-card__actions">
+                            <a class="btn btn-secondary" href="{% url 'products:detail' slug=product.slug %}">View Details</a>
+                            <form class="product-card__form" method="post" action="{% url 'orders:cart_add' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <div class="card empty-state">
+            <div class="stack">
+                <h2 class="page-title">No featured products yet</h2>
+                <p class="empty-state__text">Featured products will appear here once the catalog is populated.</p>
+            </div>
+            <a class="btn btn-primary" href="{% url 'products:list' %}">Browse Products</a>
+        </div>
+    {% endif %}
+</section>
+
+<section class="home-section stack">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Shop by Category</h2>
+            <p class="page-subtitle">Jump straight into the collection you want.</p>
+        </div>
+    </div>
+
+    {% if categories %}
+        <div class="category-grid">
+            {% for category in categories %}
+                <a class="card category-card" href="{% url 'products:list' %}?category={{ category.slug }}">
+                    <span class="category-card__name">{{ category.name }}</span>
+                    <span class="category-card__link">Browse collection</span>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-state">
+            <div class="stack">
+                <h2 class="page-title">No active categories</h2>
+                <p class="empty-state__text">Add categories to make browsing easier for customers.</p>
+            </div>
+        </div>
+    {% endif %}
+</section>
+
+<section class="home-section stack">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Why Choose Us</h2>
+            <p class="page-subtitle">A smoother shopping experience from search to checkout.</p>
+        </div>
+    </div>
+
+    <div class="feature-grid">
+        <article class="card feature-card">
+            <div class="feature-card__icon">⚡</div>
+            <h3 class="feature-card__title">Fast Delivery</h3>
+            <p class="feature-card__text">We help customers move quickly from discovery to doorstep.</p>
+        </article>
+
+        <article class="card feature-card">
+            <div class="feature-card__icon">AI</div>
+            <h3 class="feature-card__title">AI Assistant</h3>
+            <p class="feature-card__text">Get guided recommendations and instant shopping support.</p>
+        </article>
+
+        <article class="card feature-card">
+            <div class="feature-card__icon">🔒</div>
+            <h3 class="feature-card__title">Secure Payments</h3>
+            <p class="feature-card__text">Checkout with a clean, trustworthy flow built for confidence.</p>
+        </article>
+    </div>
+</section>
+{% endblock %}

@@ -3,22 +3,42 @@
 {% block title %}Payment #{{ payment.id }}{% endblock %}
 
 {% block content %}
-<div class="payment-detail-container">
-    <h1>Payment #{{ payment.id }}</h1>
-
-    <div class="payment-meta">
-        <p><strong>Order:</strong> <a href="{% url 'orders:order_detail' pk=payment.order.pk %}">#{{ payment.order.id }}</a></p>
-        <p><strong>Date:</strong> {{ payment.created_at|date:"N j, Y, P" }}</p>
-        <p><strong>Amount:</strong> ${{ payment.amount }}</p>
-        <p><strong>Status:</strong> {{ payment.get_status_display }}</p>
+<section class="stack">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Payment #{{ payment.id }}</h1>
+            <p class="page-subtitle">Recorded on {{ payment.created_at|date:"N j, Y, P" }}</p>
+        </div>
+        <span class="badge {% if payment.status == 'pending' %}badge--warning{% elif payment.status == 'completed' %}badge--success{% else %}badge--danger{% endif %}">
+            {{ payment.get_status_display }}
+        </span>
     </div>
 
-    <div class="payment-actions">
-        <a href="{% url 'payments:payment_history' %}" class="btn btn-secondary">Back to Payments</a>
-        <a href="{% url 'orders:order_detail' pk=payment.order.pk %}" class="btn btn-secondary">View Order</a>
-        {% if payment.status == 'failed' %}
-            <a href="{% url 'payments:payment_confirm' order_id=payment.order.pk %}" class="btn btn-primary">Retry Payment</a>
-        {% endif %}
+    <div class="grid-2">
+        <div class="card payment-card">
+            <div class="profile-meta">
+                <span class="badge badge--secondary">Order #{{ payment.order.id }}</span>
+                <span class="badge badge--info">Amount ${{ payment.amount }}</span>
+            </div>
+
+            <div class="summary-list">
+                <div class="summary-list__row"><strong>Order</strong><span><a href="{% url 'orders:order_detail' pk=payment.order.pk %}">#{{ payment.order.id }}</a></span></div>
+                <div class="summary-list__row"><strong>Date</strong><span>{{ payment.created_at|date:"N j, Y, P" }}</span></div>
+                <div class="summary-list__row"><strong>Amount</strong><span>${{ payment.amount }}</span></div>
+                <div class="summary-list__row"><strong>Status</strong><span>{{ payment.get_status_display }}</span></div>
+            </div>
+        </div>
+
+        <aside class="card summary-card">
+            <h2 class="page-title">Related Links</h2>
+            <div class="payment-actions">
+                <a href="{% url 'payments:payment_history' %}" class="btn btn-secondary">Back to Payments</a>
+                <a href="{% url 'orders:order_detail' pk=payment.order.pk %}" class="btn btn-primary">View Order</a>
+                {% if payment.status == 'failed' %}
+                    <a href="{% url 'payments:payment_confirm' order_id=payment.order.pk %}" class="btn btn-secondary">Retry Payment</a>
+                {% endif %}
+            </div>
+        </aside>
     </div>
-</div>
+</section>
 {% endblock %}
