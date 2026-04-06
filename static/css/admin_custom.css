@@ -1,0 +1,29 @@
+:root {
+    --primary: #2563eb;
+}
+
+.brand-link,
+.brand-link .brand-text,
+.main-header .nav-link,
+.btn-primary {
+    color: #ffffff !important;
+}
+
+.main-header.navbar,
+.brand-link,
+.btn-primary,
+.page-item.active .page-link {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.card,
+.small-box,
+.info-box,
+.nav-sidebar .nav-link {
+    border-radius: 0.5rem;
+}
+
+.content-wrapper {
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+}

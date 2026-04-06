@@ -8,6 +8,7 @@ class PaymentAdmin(admin.ModelAdmin):
     list_filter = ('status', 'created_at')
     search_fields = ('order__id', 'order__user__email')
     readonly_fields = ('created_at', 'updated_at')
+    date_hierarchy = 'created_at'
 
     fieldsets = (
         ('Payment Info', {

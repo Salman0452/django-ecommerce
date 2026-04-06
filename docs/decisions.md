@@ -52,3 +52,9 @@
 **Date**: 2026-04-06
 **Decision**: Route the storefront homepage at `/` via `products:home` and move the product catalog list to `/products/` via `products:list`, with homepage category links filtering the catalog by category slug.
 **Reason**: Matches the documented URL structure, keeps the homepage distinct from the browsable catalog, and makes the category cards useful for guided discovery.
+
+## ADR-011 — Jazzmin-powered admin with Shopify-like navigation
+**Date**: 2026-04-06
+**Decision**: Configure Django admin to use `django-jazzmin` with ShopAI branding, ordered sidebar navigation across core business apps, app-level icon mapping, and targeted `ModelAdmin` enhancements for products, orders, payments, chatbot sessions, and users.
+**Reason**: Improves admin usability and discoverability for daily operations while keeping data management in native Django admin.
+**Trade-off**: Adds a third-party dependency and static-theme customization that must be kept compatible with Django/Jazzmin upgrades.

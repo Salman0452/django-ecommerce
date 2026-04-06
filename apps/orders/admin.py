@@ -1,22 +1,27 @@
 from django.contrib import admin
+
 from .models import Cart, CartItem, Order, OrderItem
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    fields = ('product', 'quantity', 'unit_price')
+    readonly_fields = ('unit_price',)
+    extra = 0
+
+    def unit_price(self, obj):
+        return obj.price
+
+
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 0
 
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'item_count', 'created_at')
-    search_fields = ('user__email',)
-    readonly_fields = ('created_at', 'updated_at')
-    
-    fieldsets = (
-        ('Cart Info', {
-            'fields': ('user',)
-        }),
-        ('Metadata', {
-            'fields': ('created_at', 'updated_at', 'is_deleted'),
-            'classes': ('collapse',)
-        }),
-    )
+    list_display = ('user', 'item_count', 'created_at')
+    inlines = [CartItemInline]
 
 
 @admin.register(CartItem)
@@ -38,33 +43,17 @@ class CartItemAdmin(admin.ModelAdmin):
     
     def get_user_email(self, obj):
         return obj.cart.user.email
+
     get_user_email.short_description = 'User Email'
-
-
-class OrderItemInline(admin.TabularInline):
-    model = OrderItem
-    extra = 0
-    readonly_fields = ('product', 'quantity', 'price', 'created_at')
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'status', 'total_price', 'created_at')
+    list_display = ('id', 'user', 'status', 'total_price', 'created_at', 'is_cancellable')
     list_filter = ('status', 'created_at')
-    search_fields = ('user__email', 'shipping_address')
-    readonly_fields = ('created_at', 'updated_at')
+    search_fields = ('user__email',)
+    readonly_fields = ('created_at', 'updated_at', 'total_price')
+    list_editable = ('status',)
     inlines = [OrderItemInline]
-    
-    fieldsets = (
-        ('Order Info', {
-            'fields': ('user', 'status', 'total_price')
-        }),
-        ('Shipping', {
-            'fields': ('shipping_address',)
-        }),
-        ('Metadata', {
-            'fields': ('created_at', 'updated_at', 'is_deleted'),
-            'classes': ('collapse',)
-        }),
-    )
+    date_hierarchy = 'created_at'
 
